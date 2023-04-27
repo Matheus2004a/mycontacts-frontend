@@ -7,7 +7,7 @@ import defaultTheme from '../assets/styles/themes/default';
 import Header from '../components/Header';
 
 import { Container } from './styles';
-import Routes from '../routes';
+import RoutesPath from '../routes';
 
 function App() {
   return (
@@ -17,7 +17,7 @@ function App() {
 
         <Container>
           <Header />
-          <Routes />
+          <RoutesPath />
         </Container>
       </ThemeProvider>
     </BrowserRouter>

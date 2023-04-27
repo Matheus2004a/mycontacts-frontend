@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 import {
   Container, Header, ListContainer, Card,
   InputSearchContainer,
@@ -17,7 +19,7 @@ export default function Home() {
       <Header>
         <strong>3 contatos</strong>
 
-        <a href>Novo contato</a>
+        <Link to="/new">Novo contato</Link>
       </Header>
 
       <ListContainer>
@@ -39,9 +41,9 @@ export default function Home() {
           </div>
 
           <div className="actions">
-            <a href="/">
+            <Link to="/edit/123">
               <img src={edit} alt="icon-edit" />
-            </a>
+            </Link>
 
             <button type="button">
               <img src={trash} alt="icon-trash" />
@@ -59,9 +61,9 @@ export default function Home() {
           </div>
 
           <div className="actions">
-            <a href="/">
+            <Link to="/edit/456">
               <img src={edit} alt="icon-edit" />
-            </a>
+            </Link>
 
             <button type="button">
               <img src={trash} alt="icon-trash" />

@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 
 export const Container = styled.header`
+  margin-bottom: 24px;
+
   a {
     display: flex;
     align-items: center;
@@ -15,5 +17,9 @@ export const Container = styled.header`
     img {
       transform: rotate(-90deg);
     }
+  }
+
+  h2 {
+    margin-top: 10px;
   }
 `;
