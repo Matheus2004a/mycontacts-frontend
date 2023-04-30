@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 
 import useErrors from '../../hooks/useErrors';
 
+import { isEmailValid } from '../../utils/email';
+import { formatPhone } from '../../utils/phone';
+
 import FormGroup from '../FormGroup';
 import Input from '../Input';
 import Select from '../Select';
@@ -18,7 +21,7 @@ export function ContactForm({ buttonLabel }) {
     category: '',
   });
 
-  const { setError, getErrorMessageByFieldName, removeError } = useErrors();
+  const { errors, setError, getErrorMessageByFieldName, removeError } = useErrors();
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -33,11 +36,17 @@ export function ContactForm({ buttonLabel }) {
       removeError(name);
     }
 
-    setFields((prevState) => ({ ...prevState, [name]: value }));
+    if (name === 'email' && !isEmailValid(value)) setError({ field: name, message: 'E-mail inválido' });
+
+    if (name === 'telephone') {
+      return setFields((prevState) => ({ ...prevState, [name]: formatPhone(value) }));
+    }
+
+    return setFields((prevState) => ({ ...prevState, [name]: value }));
   }
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={handleSubmit} noValidate>
       <FormGroup error={getErrorMessageByFieldName('name')}>
         <Input
           type="text"
@@ -66,6 +75,7 @@ export function ContactForm({ buttonLabel }) {
           placeholder="Telefone"
           name="telephone"
           value={fields.telephone}
+          maxLength={15}
           onChange={handleFields}
           error={getErrorMessageByFieldName('telephone')}
         />
@@ -84,7 +94,7 @@ export function ContactForm({ buttonLabel }) {
         </Select>
       </FormGroup>
 
-      <Button type="submit">{buttonLabel}</Button>
+      <Button type="submit" disabled={errors.length}>{buttonLabel}</Button>
     </Form>
   );
 }
