@@ -64,6 +64,11 @@ export const ListContainer = styled.div`
       span {
         font-weight: bold;
       }
+
+      img {
+        transform: ${({ orderBy }) => (orderBy === 'asc' ? 'rotate(0deg)' : 'rotate(180deg)')};
+        transition: transform 0.2s ease-in;
+      }
     }
   }
 `;
