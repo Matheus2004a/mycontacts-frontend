@@ -13,6 +13,7 @@ import trash from '../../assets/images/icons/trash.svg';
 export default function Home() {
   const [contacts, setContacts] = useState([]);
   const [orderBy, setOrderBy] = useState('asc');
+  const [search, setSearch] = useState('');
 
   async function getContacts() {
     try {
@@ -28,6 +29,9 @@ export default function Home() {
     getContacts();
   }, [orderBy]);
 
+  const contactLowerCase = (contact) => contact.name.toLowerCase().includes(search.toLowerCase());
+  const filteredContacts = search.length > 0 ? contacts.filter(contactLowerCase) : contacts;
+
   function handleToggleOrderBy() {
     setOrderBy((prevState) => (prevState === 'asc' ? 'desc' : 'asc'));
   }
@@ -35,13 +39,18 @@ export default function Home() {
   return (
     <Container>
       <InputSearchContainer>
-        <input type="text" placeholder="Pesquisar contato..." />
+        <input
+          type="text"
+          placeholder="Pesquisar contato..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
       </InputSearchContainer>
 
       <Header>
         <strong>
-          {contacts.length}
-          {contacts.length === 1 ? ' contato' : ' contatos'}
+          {filteredContacts.length}
+          {filteredContacts.length === 1 ? ' contato' : ' contatos'}
         </strong>
 
         <Link to="/new">Novo contato</Link>
@@ -59,9 +68,9 @@ export default function Home() {
           </button>
         </header>
 
-        {!contacts.length && <p>{contacts.message}</p>}
+        {!filteredContacts.length && <p>{filteredContacts.message}</p>}
 
-        {contacts.length > 0 && contacts.map((contact) => (
+        {filteredContacts.map((contact) => (
           <Card key={contact.id}>
             <div className="info">
               <div className="contact-name">
