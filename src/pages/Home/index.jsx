@@ -1,36 +1,51 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 
 import {
   Container, Header, ListContainer, Card,
-  InputSearchContainer,
+  InputSearchContainer, ErrorContainer, EmptyListContainer, SearchNotFoundContainer,
+  /* ErrorFilterContacts */
 } from './styles';
 
 import arrow from '../../assets/images/icons/arrow.svg';
 import edit from '../../assets/images/icons/edit.svg';
 import trash from '../../assets/images/icons/trash.svg';
+import sad from '../../assets/images/icons/sad.svg';
+import lupe from '../../assets/images/icons/magnifier-question.svg';
+import emptyBox from '../../assets/images/icons/empty-box.svg';
+
+import { Loader } from '../../components/Loader';
+import Button from '../../components/Button';
+
+import ContactsServices from '../../services/ContactsServices';
 
 export default function Home() {
   const [contacts, setContacts] = useState([]);
   const [orderBy, setOrderBy] = useState('asc');
   const [search, setSearch] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
 
-  async function getContacts() {
+  const getContacts = useCallback(async () => {
     try {
-      const response = await fetch(`https://mycontacts-backend.vercel.app/contacts?orderBy=${orderBy}`);
-      const data = await response.json();
-      setContacts(data);
+      setIsLoading(true);
+      const contactsList = await ContactsServices.listContacts(orderBy);
+      setHasError(false);
+      setContacts(contactsList);
     } catch (error) {
-      console.error(error);
+      setHasError(true);
     }
-  }
+    setIsLoading(false);
+  }, [orderBy]);
 
   useEffect(() => {
     getContacts();
-  }, [orderBy]);
+  }, [getContacts]);
 
-  const contactLowerCase = (contact) => contact.name.toLowerCase().includes(search.toLowerCase());
-  const filteredContacts = search.length > 0 ? contacts.filter(contactLowerCase) : contacts;
+  const filteredContacts = useMemo(() => {
+    const contactLowerCase = (contact) => contact.name.toLowerCase().includes(search.toLowerCase());
+    return contacts.filter(contactLowerCase);
+  }, [contacts, search]);
 
   function handleToggleOrderBy() {
     setOrderBy((prevState) => (prevState === 'asc' ? 'desc' : 'asc'));
@@ -38,61 +53,107 @@ export default function Home() {
 
   return (
     <Container>
-      <InputSearchContainer>
-        <input
-          type="text"
-          placeholder="Pesquisar contato..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </InputSearchContainer>
+      <Loader isLoading={isLoading} />
 
-      <Header>
-        <strong>
-          {filteredContacts.length}
-          {filteredContacts.length === 1 ? ' contato' : ' contatos'}
-        </strong>
+      {contacts.length > 0 && (
+        <InputSearchContainer>
+          <input
+            type="text"
+            placeholder="Pesquisar contato..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </InputSearchContainer>
+      )}
+
+      <Header
+        justifyContent={
+          // eslint-disable-next-line no-nested-ternary
+          hasError ? 'flex-end' : (
+            (contacts.length > 0 ? 'space-between' : 'center')
+          )
+        }
+      >
+        {(!hasError && contacts.length > 0) && (
+          <strong>
+            {filteredContacts.length}
+            {filteredContacts.length === 1 ? ' contato' : ' contatos'}
+          </strong>
+        )}
 
         <Link to="/new">Novo contato</Link>
       </Header>
 
-      <ListContainer orderBy={orderBy}>
-        <header>
-          <button
-            type="button"
-            className="sort-button"
-            onClick={handleToggleOrderBy}
-          >
-            <span>Nome</span>
-            <img src={arrow} alt="arrow" />
-          </button>
-        </header>
+      {hasError && (
+        <ErrorContainer>
+          <img src={sad} alt="sad" />
+          <figcaption>
+            <strong>Ocorreu um erro ao obter os seus contatos!</strong>
+            <Button type="button" onClick={getContacts}>Tentar novamente</Button>
+          </figcaption>
+        </ErrorContainer>
+      )}
 
-        {!filteredContacts.length && <p>{filteredContacts.message}</p>}
+      {!hasError && (
+        <ListContainer orderBy={orderBy}>
+          {(contacts.length < 1 && !isLoading) && (
+            <EmptyListContainer>
+              <img src={emptyBox} alt="empty-box" />
+              <figcaption>
+                Você ainda não tem nenhum contato cadastrado!
+                Clique no botão <strong>”Novo contato”</strong> à cima
+                para cadastrar o seu primeiro!
+              </figcaption>
+            </EmptyListContainer>
+          )}
+          <>
+            {(contacts.length > 0 && filteredContacts.length < 1) && (
+              <SearchNotFoundContainer>
+                <img src={lupe} alt="lupe" />
+                <figcaption>
+                  Nenhum resultado foi encontrado para <strong>{search}.</strong>
+                </figcaption>
+              </SearchNotFoundContainer>
+            )}
 
-        {filteredContacts.map((contact) => (
-          <Card key={contact.id}>
-            <div className="info">
-              <div className="contact-name">
-                <strong>{contact.name}</strong>
-                {contact.category_name && <small>{contact.category_name}</small>}
-              </div>
-              <span>{contact.email}</span>
-              <span>{contact.phone}</span>
-            </div>
+            {filteredContacts.length > 0 && (
+              <header>
+                <button
+                  type="button"
+                  className="sort-button"
+                  onClick={handleToggleOrderBy}
+                >
+                  <span>Nome</span>
+                  <img src={arrow} alt="arrow" />
+                </button>
+              </header>
+            )}
 
-            <div className="actions">
-              <Link to={`/edit/${contact.id}`}>
-                <img src={edit} alt="icon-edit" />
-              </Link>
+            {filteredContacts.map((contact) => (
+              <Card key={contact.id}>
+                <div className="info">
+                  <div className="contact-name">
+                    <strong>{contact.name}</strong>
+                    {contact.category_name && <small>{contact.category_name}</small>}
+                  </div>
+                  <span>{contact.email}</span>
+                  <span>{contact.phone}</span>
+                </div>
 
-              <button type="button">
-                <img src={trash} alt="icon-trash" />
-              </button>
-            </div>
-          </Card>
-        ))}
-      </ListContainer>
+                <div className="actions">
+                  <Link to={`/edit/${contact.id}`}>
+                    <img src={edit} alt="icon-edit" />
+                  </Link>
+
+                  <button type="button">
+                    <img src={trash} alt="icon-trash" />
+                  </button>
+                </div>
+              </Card>
+            ))}
+          </>
+        </ListContainer>
+      )}
     </Container>
   );
 }
