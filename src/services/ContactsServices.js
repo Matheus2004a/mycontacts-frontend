@@ -9,8 +9,16 @@ class ContactsServices {
     return this.httpClient.get(`/contacts?orderBy=${orderBy}`);
   }
 
+  async listContactById(id) {
+    return this.httpClient.get(`/contacts/${id}`);
+  }
+
   async createContact(data) {
     return this.httpClient.post('/contacts', { body: JSON.stringify(data) });
+  }
+
+  async editContact(data, id) {
+    return this.httpClient.post(`/contacts/:${id}`, { body: JSON.stringify(data) });
   }
 }
 

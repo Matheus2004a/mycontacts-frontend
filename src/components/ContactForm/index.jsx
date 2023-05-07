@@ -25,12 +25,18 @@ export function ContactForm({ buttonLabel, onSubmit }) {
 
   const [categories, setCategories] = useState([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { errors, setError, getErrorMessageByFieldName, removeError } = useErrors();
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    onSubmit(fields);
+
+    setIsSubmitting(true);
+
+    await onSubmit(fields);
+
+    setIsSubmitting(false);
   }
 
   function handleFields(e) {
@@ -75,6 +81,7 @@ export function ContactForm({ buttonLabel, onSubmit }) {
           value={fields.name}
           onChange={handleFields}
           error={getErrorMessageByFieldName('name')}
+          disabled={isSubmitting}
         />
       </FormGroup>
 
@@ -86,6 +93,7 @@ export function ContactForm({ buttonLabel, onSubmit }) {
           value={fields.email}
           onChange={handleFields}
           error={getErrorMessageByFieldName('email')}
+          disabled={isSubmitting}
         />
       </FormGroup>
 
@@ -98,6 +106,7 @@ export function ContactForm({ buttonLabel, onSubmit }) {
           maxLength={15}
           onChange={handleFields}
           error={getErrorMessageByFieldName('telephone')}
+          disabled={isSubmitting}
         />
       </FormGroup>
 
@@ -109,7 +118,7 @@ export function ContactForm({ buttonLabel, onSubmit }) {
           name="category"
           value={fields.category}
           onChange={handleFields}
-          disabled={isLoadingCategories}
+          disabled={isLoadingCategories || isSubmitting}
         >
           <option value="" disabled>Categoria</option>
           {categories.map((category) => (
@@ -120,7 +129,13 @@ export function ContactForm({ buttonLabel, onSubmit }) {
         </Select>
       </FormGroup>
 
-      <Button type="submit" disabled={errors.length}>{buttonLabel}</Button>
+      <Button
+        type="submit"
+        disabled={errors.length > 0}
+        isLoading={isSubmitting}
+      >
+        {buttonLabel}
+      </Button>
     </Form>
   );
 }

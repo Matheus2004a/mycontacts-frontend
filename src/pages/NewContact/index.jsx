@@ -2,6 +2,7 @@ import PageHeader from '../../components/PageHeader';
 import { ContactForm } from '../../components/ContactForm';
 
 import { removeMaskPhone } from '../../utils/phone';
+import toast from '../../utils/toast';
 
 import ContactsServices from '../../services/ContactsServices';
 
@@ -16,9 +17,9 @@ export default function NewContact() {
       };
 
       const response = await ContactsServices.createContact(contact);
-      console.log(response);
+      toast({ type: 'success', text: response.message });
     } catch (error) {
-      console.error(error.message);
+      toast({ type: 'danger', text: error.message });
     }
   }
 
