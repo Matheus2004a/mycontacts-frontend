@@ -5,19 +5,19 @@ class ContactsServices {
     this.httpClient = new HttpClient('https://mycontacts-backend.vercel.app');
   }
 
-  async listContacts(orderBy = 'asc') {
+  listContacts(orderBy = 'asc') {
     return this.httpClient.get(`/contacts?orderBy=${orderBy}`);
   }
 
-  async listContactById(id) {
+  listContactById(id) {
     return this.httpClient.get(`/contacts/${id}`);
   }
 
-  async createContact(data) {
+  createContact(data) {
     return this.httpClient.post('/contacts', { body: JSON.stringify(data) });
   }
 
-  async editContact(data, id) {
+  editContact(data, id) {
     return this.httpClient.post(`/contacts/:${id}`, { body: JSON.stringify(data) });
   }
 }

@@ -15,8 +15,8 @@ import Button from '../Button';
 
 import { Form } from './style';
 
-export function ContactForm({ buttonLabel, onSubmit }) {
-  const [fields, setFields] = useState({
+export function ContactForm({ buttonLabel, onSubmit, contact }) {
+  const [fields, setFields] = useState(contact || {
     name: '',
     email: '',
     telephone: '',
@@ -50,7 +50,7 @@ export function ContactForm({ buttonLabel, onSubmit }) {
 
     if (name === 'email' && !isEmailValid(value)) setError({ field: name, message: 'E-mail inválido' });
 
-    if (name === 'telephone') {
+    if (name === 'phone') {
       return setFields((prevState) => ({ ...prevState, [name]: formatPhone(value) }));
     }
 
@@ -97,15 +97,15 @@ export function ContactForm({ buttonLabel, onSubmit }) {
         />
       </FormGroup>
 
-      <FormGroup error={getErrorMessageByFieldName('telephone')}>
+      <FormGroup error={getErrorMessageByFieldName('phone')}>
         <Input
           type="tel"
           placeholder="Telefone"
-          name="telephone"
-          value={fields.telephone}
+          name="phone"
+          value={fields.phone}
           maxLength={15}
           onChange={handleFields}
-          error={getErrorMessageByFieldName('telephone')}
+          error={getErrorMessageByFieldName('phone')}
           disabled={isSubmitting}
         />
       </FormGroup>
@@ -143,4 +143,5 @@ export function ContactForm({ buttonLabel, onSubmit }) {
 ContactForm.propTypes = {
   buttonLabel: PropTypes.node.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  contact: PropTypes.shape().isRequired,
 };

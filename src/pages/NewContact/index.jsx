@@ -17,7 +17,7 @@ export default function NewContact() {
       };
 
       const response = await ContactsServices.createContact(contact);
-      toast({ type: 'success', text: response.message });
+      toast({ type: 'success', text: response.message, duration: 3000 });
     } catch (error) {
       toast({ type: 'danger', text: error.message });
     }

@@ -1,24 +1,31 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import PageHeader from '../../components/PageHeader';
 import { ContactForm } from '../../components/ContactForm';
+import { Loader } from '../../components/Loader';
 
 import { removeMaskPhone } from '../../utils/phone';
+import toast from '../../utils/toast';
 
 import ContactsServices from '../../services/ContactsServices';
 
 export default function EditContact() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [contact, setContact] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
   const getContactById = useCallback(async () => {
     try {
+      setIsLoading(true);
       const response = await ContactsServices.listContactById(id);
       setContact(response);
+      setIsLoading(false);
     } catch (error) {
-      console.error(error.message);
+      navigate('/');
+      toast({ type: 'danger', text: error.message });
     }
   }, [id]);
 
@@ -46,10 +53,15 @@ export default function EditContact() {
 
   return (
     <>
-      <PageHeader title={`Editar ${contact?.name}`} />
+      <Loader isLoading={isLoading} />
+
+      <PageHeader title={isLoading ? 'Carregando...' : `Editar ${contact?.name}`} />
+
       <ContactForm
+        key={contact.id}
         buttonLabel="Salvar alterações"
         onSubmit={handleSubmit}
+        contact={contact}
       />
     </>
   );
