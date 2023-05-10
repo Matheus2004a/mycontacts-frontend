@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import PageHeader from '../../components/PageHeader';
 import { ContactForm } from '../../components/ContactForm';
 import { Loader } from '../../components/Loader';
 
-import { removeMaskPhone } from '../../utils/phone';
+import { formatPhone, removeMaskPhone } from '../../utils/phone';
 import toast from '../../utils/toast';
 
 import ContactsServices from '../../services/ContactsServices';
@@ -14,20 +14,29 @@ export default function EditContact() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [contact, setContact] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+
+  const contactsFormRef = useRef(null);
+  const [contactName, setContactName] = useState('');
 
   const getContactById = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await ContactsServices.listContactById(id);
-      setContact(response);
+      const contact = await ContactsServices.listContactById(id);
+
+      const contactWithPhoneFormatted = {
+        ...contact,
+        phone: formatPhone(contact.phone),
+      };
+
+      setContactName(contact.name);
+      contactsFormRef.current.setFieldsValues(contactWithPhoneFormatted);
       setIsLoading(false);
     } catch (error) {
       navigate('/');
       toast({ type: 'danger', text: error.message });
     }
-  }, [id]);
+  }, [id, navigate]);
 
   useEffect(() => {
     getContactById();
@@ -36,18 +45,16 @@ export default function EditContact() {
   async function handleSubmit(formData) {
     try {
       const contactEdited = {
-        id,
         email: formData.email,
         name: formData.name,
-        phone: removeMaskPhone(formData.telephone),
+        phone: removeMaskPhone(formData.phone),
       };
 
-      console.log(contactEdited);
-
-      /*  const response = await ContactsServices.editContact(contact, contact.id);
-      console.log(response); */
+      setContactName(contactEdited.name);
+      const response = await ContactsServices.updateContact(id, contactEdited);
+      toast({ type: 'success', text: response.message, duration: 3000 });
     } catch (error) {
-      console.error(error.message);
+      toast({ type: 'danger', text: error.message });
     }
   }
 
@@ -55,13 +62,12 @@ export default function EditContact() {
     <>
       <Loader isLoading={isLoading} />
 
-      <PageHeader title={isLoading ? 'Carregando...' : `Editar ${contact?.name}`} />
+      <PageHeader title={isLoading ? 'Carregando...' : `Editar ${contactName}`} />
 
       <ContactForm
-        key={contact.id}
+        ref={contactsFormRef}
         buttonLabel="Salvar alterações"
         onSubmit={handleSubmit}
-        contact={contact}
       />
     </>
   );

@@ -17,8 +17,8 @@ class ContactsServices {
     return this.httpClient.post('/contacts', { body: JSON.stringify(data) });
   }
 
-  editContact(data, id) {
-    return this.httpClient.post(`/contacts/:${id}`, { body: JSON.stringify(data) });
+  updateContact(id, data) {
+    return this.httpClient.put(`/contacts/${id}`, { body: JSON.stringify(data) });
   }
 }
 

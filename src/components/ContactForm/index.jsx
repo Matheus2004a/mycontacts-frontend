@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import useErrors from '../../hooks/useErrors';
@@ -15,11 +15,11 @@ import Button from '../Button';
 
 import { Form } from './style';
 
-export function ContactForm({ buttonLabel, onSubmit, contact }) {
-  const [fields, setFields] = useState(contact || {
+export const ContactForm = forwardRef(({ buttonLabel, onSubmit }, ref) => {
+  const [fields, setFields] = useState({
     name: '',
     email: '',
-    telephone: '',
+    phone: '',
     category: '',
   });
 
@@ -28,6 +28,21 @@ export function ContactForm({ buttonLabel, onSubmit, contact }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { errors, setError, getErrorMessageByFieldName, removeError } = useErrors();
+
+  useImperativeHandle(ref, () => ({
+    setFieldsValues: (contact) => {
+      Object.entries(contact).forEach(([key, value]) => {
+        setFields((prevState) => ({ ...prevState, [key]: value }));
+      });
+    },
+
+    resetFields: () => {
+      Object.entries(fields).forEach(([key]) => {
+        setFields((prevState) => ({ ...prevState, [key]: '' }));
+      });
+    },
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), []);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -138,10 +153,9 @@ export function ContactForm({ buttonLabel, onSubmit, contact }) {
       </Button>
     </Form>
   );
-}
+});
 
 ContactForm.propTypes = {
   buttonLabel: PropTypes.node.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  contact: PropTypes.shape().isRequired,
 };
