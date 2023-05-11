@@ -35,6 +35,8 @@ export default function EditContact() {
     } catch (error) {
       navigate('/');
       toast({ type: 'danger', text: error.message });
+    } finally {
+      setIsLoading(false);
     }
   }, [id, navigate]);
 
