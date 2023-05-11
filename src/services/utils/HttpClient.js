@@ -23,6 +23,12 @@ class HttpClient {
     });
   }
 
+  delete(path) {
+    return this.makeRequest(path, {
+      method: 'DELETE',
+    });
+  }
+
   async makeRequest(path, options) {
     const headers = new Headers();
 

@@ -41,7 +41,7 @@ export const ContactForm = forwardRef(({ buttonLabel, onSubmit }, ref) => {
         setFields((prevState) => ({ ...prevState, [key]: '' }));
       });
     },
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }), []);
 
   async function handleSubmit(e) {

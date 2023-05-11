@@ -3,9 +3,9 @@ import styled from 'styled-components';
 export const Overlay = styled.div`
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(3.5px);
-  position: absolute;
+  position: fixed;
   width: 100%;
-  height: 100%;
+  height: 100vh;
   left: 0;
   top: 0;
   display: flex;
@@ -27,7 +27,7 @@ export const Container = styled.div`
   }
 
   p {
-    margin-top: 8px;
+    margin-top: 32px;
   }
 `;
 
@@ -43,6 +43,10 @@ export const Footer = styled.footer`
     border: none;
     font-size: 16px;
     color: ${({ theme }) => theme.colors.gray[200]};
+
+    &[disabled] {
+      cursor: not-allowed;
+    }
   }
 
   button {
