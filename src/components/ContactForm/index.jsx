@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import useErrors from '../../hooks/useErrors';
@@ -7,6 +7,8 @@ import { isEmailValid } from '../../utils/email';
 import { formatPhone } from '../../utils/phone';
 
 import CategoriesService from '../../services/CategoriesService';
+
+import useSafeAsyncState from '../../hooks/useSafeAsyncState';
 
 import FormGroup from '../FormGroup';
 import Input from '../Input';
@@ -23,8 +25,8 @@ export const ContactForm = forwardRef(({ buttonLabel, onSubmit }, ref) => {
     category: '',
   });
 
-  const [categories, setCategories] = useState([]);
-  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+  const [categories, setCategories] = useSafeAsyncState([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useSafeAsyncState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { errors, setError, getErrorMessageByFieldName, removeError } = useErrors();
@@ -72,7 +74,7 @@ export const ContactForm = forwardRef(({ buttonLabel, onSubmit }, ref) => {
     return setFields((prevState) => ({ ...prevState, [name]: value }));
   }
 
-  async function loadCategories() {
+  const loadCategories = useCallback(async () => {
     try {
       setIsLoadingCategories(true);
       const categoriesList = await CategoriesService.listCategories();
@@ -80,11 +82,11 @@ export const ContactForm = forwardRef(({ buttonLabel, onSubmit }, ref) => {
     } catch { } finally {
       setIsLoadingCategories(false);
     }
-  }
+  }, [setCategories, setIsLoadingCategories]);
 
   useEffect(() => {
     loadCategories();
-  }, []);
+  }, [loadCategories]);
 
   return (
     <Form onSubmit={handleSubmit} noValidate>

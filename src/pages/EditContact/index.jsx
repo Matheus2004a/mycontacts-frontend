@@ -9,15 +9,17 @@ import { formatPhone, removeMaskPhone } from '../../utils/phone';
 import toast from '../../utils/toast';
 
 import ContactsServices from '../../services/ContactsServices';
+import useSafeAsyncAction from '../../hooks/useSafeAsyncAction';
 
 export default function EditContact() {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(true);
+  const [contactName, setContactName] = useState('');
 
   const contactsFormRef = useRef(null);
-  const [contactName, setContactName] = useState('');
+  const safeAsyncAction = useSafeAsyncAction();
 
   const getContactById = useCallback(async () => {
     try {
@@ -29,16 +31,18 @@ export default function EditContact() {
         phone: formatPhone(contact.phone),
       };
 
-      setContactName(contact.name);
-      contactsFormRef.current.setFieldsValues(contactWithPhoneFormatted);
-      setIsLoading(false);
+      safeAsyncAction(() => {
+        setContactName(contact.name);
+        contactsFormRef.current.setFieldsValues(contactWithPhoneFormatted);
+        setIsLoading(false);
+      });
     } catch (error) {
       navigate('/');
       toast({ type: 'danger', text: error.message });
     } finally {
-      setIsLoading(false);
+      safeAsyncAction(() => setIsLoading(false));
     }
-  }, [id, navigate]);
+  }, [id, navigate, safeAsyncAction]);
 
   useEffect(() => {
     getContactById();
