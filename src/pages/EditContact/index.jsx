@@ -51,6 +51,7 @@ export default function EditContact() {
   async function handleSubmit(formData) {
     try {
       const contactEdited = {
+        category_id: formData.category || null,
         email: formData.email,
         name: formData.name,
         phone: removeMaskPhone(formData.phone),
