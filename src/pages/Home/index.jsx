@@ -21,6 +21,10 @@ export default function Home() {
     search, handleSearchContact, hasError, orderBy,
   } = useHome();
 
+  const hasContacts = !hasError && contacts.length > 0;
+  const isListEmpty = !hasContacts && !isLoading;
+  const isSearchEmpty = hasContacts && filteredContacts.length < 1;
+
   return (
     <Container>
       <Loader isLoading={isLoading} />
@@ -38,7 +42,7 @@ export default function Home() {
         <p>Esta ação não poderá ser desfeita!</p>
       </Modal>
 
-      {contacts.length > 0 && (
+      {hasContacts && (
         <InputSearch
           value={search}
           onChange={handleSearchContact}
@@ -52,23 +56,16 @@ export default function Home() {
       />
 
       {hasError && <ErrorStatus onTryAgain={getContacts} />}
+      {isListEmpty && <EmptyList />}
+      {isSearchEmpty && <SearchNotFound search={search} />}
 
-      {!hasError && (
+      {hasContacts && (
         <ListContainer orderBy={orderBy}>
-          {(contacts.length < 1 && !isLoading) && (
-            <EmptyList />
-          )}
-          <>
-            {(contacts.length > 0 && filteredContacts.length < 1) && (
-              <SearchNotFound search={search} />
-            )}
-
-            <ContactsLists
-              filteredContacts={filteredContacts}
-              onToggleOrderBy={handleToggleOrderBy}
-              onDeleteContact={handleDeleteContact}
-            />
-          </>
+          <ContactsLists
+            filteredContacts={filteredContacts}
+            onToggleOrderBy={handleToggleOrderBy}
+            onDeleteContact={handleDeleteContact}
+          />
         </ListContainer>
       )}
     </Container>
