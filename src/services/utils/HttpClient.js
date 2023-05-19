@@ -12,14 +12,14 @@ class HttpClient {
   post(path, options) {
     return this.makeRequest(path, {
       method: 'POST',
-      body: options.body,
+      body: JSON.stringify(options.body),
     });
   }
 
   put(path, options) {
     return this.makeRequest(path, {
       method: 'PUT',
-      body: options.body,
+      body: JSON.stringify(options.body),
     });
   }
 
