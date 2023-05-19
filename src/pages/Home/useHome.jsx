@@ -67,6 +67,10 @@ export default function useHome() {
     }
   }
 
+  function handleSearchContact(e) {
+    setSearch(e.target.value);
+  }
+
   return {
     contacts,
     contactBeginDeleted,
@@ -83,5 +87,6 @@ export default function useHome() {
     handleDeleteContact,
     handleCloseDeleteModal,
     handleConfirmDeleteContact,
+    handleSearchContact,
   };
 }
