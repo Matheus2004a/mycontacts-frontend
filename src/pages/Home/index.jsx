@@ -21,8 +21,8 @@ export default function Home() {
     search, handleSearchContact, hasError, orderBy,
   } = useHome();
 
-  const hasContacts = !hasError && contacts.length > 0;
-  const isListEmpty = !hasContacts && !isLoading;
+  const hasContacts = contacts.length > 0;
+  const isListEmpty = !hasError && (!hasContacts && !isLoading);
   const isSearchEmpty = hasContacts && filteredContacts.length < 1;
 
   return (
