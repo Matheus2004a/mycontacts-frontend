@@ -8,8 +8,8 @@ import useAnimatedList from '../../../hooks/useAnimatedList';
 
 export default function ToastContainer() {
   const {
-    items: messages, setItems: setMessages, pendingRemovaItemsIds,
-    handleAnimationEndItem, handleRemoveItem,
+    setItems: setMessages,
+    handleRemoveItem, handleAnimationEndItem, renderList,
   } = useAnimatedList();
 
   useEffect(() => {
@@ -29,11 +29,12 @@ export default function ToastContainer() {
 
   return (
     <Container>
-      {messages.map((message) => (
+      {renderList((message, { isLeaving, animatedRef }) => (
         <ToastMessage
           key={message.id}
           message={message}
-          isLeaving={pendingRemovaItemsIds.includes(message.id)}
+          isLeaving={isLeaving}
+          animatedRef={animatedRef}
           onAnimationEndMessage={handleAnimationEndItem}
           onRemoveMessage={() => handleRemoveItem(message.id)}
         />
