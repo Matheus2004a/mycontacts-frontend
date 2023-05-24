@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { memo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import { Container } from './styles';
@@ -6,7 +6,7 @@ import { Container } from './styles';
 import xCircleIcon from '../../../assets/images/icons/x-circle.svg';
 import checkCircleIcon from '../../../assets/images/icons/check-circle.svg';
 
-export default function ToastMessage({
+function ToastMessage({
   message, isLeaving, onAnimationEndMessage,
   onRemoveMessage, animatedRef,
 }) {
@@ -64,3 +64,5 @@ ToastMessage.propTypes = {
   onRemoveMessage: PropTypes.func.isRequired,
   animatedRef: PropTypes.shape().isRequired,
 };
+
+export default memo(ToastMessage);

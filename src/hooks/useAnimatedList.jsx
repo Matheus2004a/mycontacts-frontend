@@ -15,7 +15,7 @@ export default function useAnimatedList(initialValue = []) {
     animationEndListeners.current.delete(itemId);
 
     setItems((prevState) => prevState.filter((message) => message.id !== itemId));
-    setPendingRemovaItemsIds((prevState) => prevState.filter((messageId) => messageId !== itemId));
+    setPendingRemovaItemsIds((prevState) => prevState.filter((message) => message.id !== itemId));
   }, []);
 
   useEffect(() => {

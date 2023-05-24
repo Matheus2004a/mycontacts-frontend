@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
-import { formatPhone, removeMaskPhone } from '../../utils/phone';
+import { formatPhone } from '../../utils/phone';
 import toast from '../../utils/toast';
 
 import ContactsServices from '../../services/ContactsServices';
@@ -46,15 +46,8 @@ export default function useEditContact() {
 
   async function handleSubmit(formData) {
     try {
-      const contactEdited = {
-        category_id: formData.category || null,
-        email: formData.email,
-        name: formData.name,
-        phone: removeMaskPhone(formData.phone),
-      };
-
-      setContactName(contactEdited.name);
-      const response = await ContactsServices.updateContact(id, contactEdited);
+      setContactName(formData.name);
+      const response = await ContactsServices.updateContact(id, formData);
       toast({ type: 'success', text: response.message, duration: 3000 });
     } catch (error) {
       toast({ type: 'danger', text: error.message });
