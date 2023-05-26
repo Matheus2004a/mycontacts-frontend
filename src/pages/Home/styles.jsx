@@ -29,3 +29,10 @@ export const ListContainer = styled.div`
     }
   }
 `;
+
+export const Alignment = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+`;

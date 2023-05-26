@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useTransition } from 'react';
 
 import toast from '../../utils/toast';
 
@@ -7,12 +7,16 @@ import ContactsServices from '../../services/ContactsServices';
 export default function useHome() {
   const [contacts, setContacts] = useState([]);
   const [orderBy, setOrderBy] = useState('asc');
-  const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingDelete, setIsLoadingDelete] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [contactBeginDeleted, setContactBeginDeleted] = useState(null);
+
+  const [search, setSearch] = useState('');
+  const [deferredSearch, setDeferredSearch] = useState('');
+
+  const [isPending, startTransition] = useTransition('');
 
   const getContacts = useCallback(async () => {
     try {
@@ -32,18 +36,30 @@ export default function useHome() {
   }, [getContacts]);
 
   const filteredContacts = useMemo(() => {
-    const contactLowerCase = (contact) => contact.name.toLowerCase().includes(search.toLowerCase());
+    const contactLowerCase = (contact) => (
+      contact.name.toLowerCase().includes(deferredSearch.toLowerCase())
+    );
     return contacts.filter(contactLowerCase);
-  }, [contacts, search]);
+  }, [contacts, deferredSearch]);
 
-  function handleToggleOrderBy() {
-    setOrderBy((prevState) => (prevState === 'asc' ? 'desc' : 'asc'));
+  function handleSearchContact(e) {
+    const { value } = e.target;
+
+    setSearch(value);
+
+    startTransition(() => {
+      setDeferredSearch(value);
+    });
   }
 
-  function handleDeleteContact(contact) {
+  const handleToggleOrderBy = useCallback(() => {
+    setOrderBy((prevState) => (prevState === 'asc' ? 'desc' : 'asc'));
+  }, []);
+
+  const handleDeleteContact = useCallback((contact) => {
     setContactBeginDeleted(contact);
     setIsModalVisible(true);
-  }
+  }, []);
 
   function handleCloseDeleteModal() {
     setIsModalVisible(false);
@@ -68,16 +84,12 @@ export default function useHome() {
     }
   }
 
-  function handleSearchContact(e) {
-    setSearch(e.target.value);
-  }
-
   return {
+    isPending,
     contacts,
     contactBeginDeleted,
     getContacts,
     search,
-    setSearch,
     isLoading,
     isLoadingDelete,
     hasError,

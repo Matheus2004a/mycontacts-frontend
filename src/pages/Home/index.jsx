@@ -1,4 +1,4 @@
-import { Container, ListContainer } from './styles';
+import { Alignment, Container, ListContainer } from './styles';
 
 import useHome from './useHome';
 
@@ -11,10 +11,11 @@ import ErrorStatus from './components/ErrorStatus';
 import EmptyList from './components/EmptyList';
 import SearchNotFound from './components/SearchNotFound';
 import ContactsLists from './components/ContactsLists';
+import Spinner from '../../components/Spinner';
 
 export default function Home() {
   const {
-    isLoading, isModalVisible, isLoadingDelete,
+    isPending, isLoading, isModalVisible, isLoadingDelete,
     handleCloseDeleteModal, handleConfirmDeleteContact,
     handleDeleteContact, handleToggleOrderBy,
     contacts, filteredContacts, contactBeginDeleted, getContacts,
@@ -54,6 +55,13 @@ export default function Home() {
         qtdContacts={contacts.length}
         qtdContactsFiltered={filteredContacts.length}
       />
+
+      {isPending
+        && (
+          <Alignment>
+            <Spinner size={16} />
+          </Alignment>
+        )}
 
       {hasError && <ErrorStatus onTryAgain={getContacts} />}
       {isListEmpty && <EmptyList />}
