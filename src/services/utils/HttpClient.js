@@ -5,8 +5,11 @@ class HttpClient {
     this.baseURL = baseURL;
   }
 
-  get(path) {
-    return this.makeRequest(path, { method: 'GET' });
+  get(path, options) {
+    return this.makeRequest(path, {
+      method: 'GET',
+      signal: options?.signal,
+    });
   }
 
   post(path, options) {
@@ -46,6 +49,7 @@ class HttpClient {
       method: options.method,
       body: options.body,
       headers,
+      signal: options.signal,
     });
 
     let body = null;

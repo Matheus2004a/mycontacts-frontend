@@ -19,13 +19,17 @@ export default function useHome() {
 
   const [isPending, startTransition] = useTransition('');
 
-  const getContacts = useCallback(async () => {
+  const getContacts = useCallback(async (signal) => {
     try {
       setIsLoading(true);
-      const contactsList = await ContactsServices.listContacts(orderBy);
+      const contactsList = await ContactsServices.listContacts(signal, orderBy);
       setHasError(false);
       setContacts(contactsList);
     } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        return;
+      }
+
       // eslint-disable-next-line no-unused-expressions
       (error instanceof ApiError) ? setHasError(false) : setHasError(true);
       setContacts([]);
@@ -34,7 +38,13 @@ export default function useHome() {
   }, [orderBy]);
 
   useEffect(() => {
-    getContacts();
+    const controller = new AbortController();
+
+    getContacts(controller.signal);
+
+    return () => {
+      controller.abort();
+    };
   }, [getContacts]);
 
   const filteredContacts = useMemo(() => {
