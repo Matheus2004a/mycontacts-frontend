@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo, useCallback, useTransition } from 'react'
 import toast from '../../utils/toast';
 
 import ContactsServices from '../../services/ContactsServices';
+import ApiError from '../../errors/ApiError';
 
 export default function useHome() {
   const [contacts, setContacts] = useState([]);
@@ -25,7 +26,8 @@ export default function useHome() {
       setHasError(false);
       setContacts(contactsList);
     } catch (error) {
-      setHasError(true);
+      // eslint-disable-next-line no-unused-expressions
+      (error instanceof ApiError) ? setHasError(false) : setHasError(true);
       setContacts([]);
     }
     setIsLoading(false);
