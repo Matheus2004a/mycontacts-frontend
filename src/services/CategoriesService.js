@@ -3,7 +3,7 @@ import HttpClient from './utils/HttpClient';
 
 class CategoriesServices {
   constructor() {
-    this.httpClient = new HttpClient('http://localhost:3001');
+    this.httpClient = new HttpClient('https://mycontacts-frontend-matheus-aurelio.vercel.app');
   }
 
   async listCategories() {
